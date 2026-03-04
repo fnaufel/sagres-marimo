@@ -1,0 +1,178 @@
+---
+title: "Uso remoto do supercomputador Escola de Sagres no projeto BioSensIA"
+author: 
+  name: "Fernando Náufel"
+  email: fnaufel@gmail.com
+date: now
+date-format: "DD/MM/YYYY HH:mm"
+lang: pt
+execute: 
+  echo: true
+  eval: false
+  warning: true
+  error: true
+  include: true
+  env:
+    # quarto still does not include python warnings in the output :(
+    PYTHONWARNINGS: always
+    
+bibliography: bibliography.bib
+
+# Português:
+csl: springer-lecture-notes-in-computer-science.csl
+
+format:
+  # pdf: 
+  #   toc: true
+  #   toc-depth: 3
+  #   number-depth: 3
+    
+  html:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    number-depth: 3
+    theme:
+      - journal
+      - _custom.scss
+    link-external-icon: false
+    link-external-newwindow: false
+    link-external-filter: ^(?:http:|https:)\/\/fnaufel\.github\.io
+    df-print: paged
+    code-link: true
+    code-copy: true
+    code-tools: true
+    self-contained: true
+    
+---
+
+{{< include _math.qmd >}}
+
+```{r setup, include=FALSE}
+source('_setup.R')
+library(reticulate)
+use_virtualenv('../.venv')
+```
+
+
+# Sobre este documento
+
+Este documento foi gerado usando Quarto^[Quarto: <https://quarto.org/>.], a partir do arquivo fonte <https://github.com/fnaufel/???> (salvo em um repositório privado no Github; entre em contato caso deseje ter acesso).
+
+A maneira mais fácil de ver o fonte que gerou este documento é clicando no *link* `</> Código`, no alto desta página, à direita.
+
+Caso você tenha perguntas, correções ou sugestões sobre o conteúdo deste documento, entre em contato por *e-mail* ou abra um *issue* no repositório do Github.
+
+
+# Objetivos
+
+- Apresentar o supercomputador Escola de Sagres.
+- Explicar como usar o Escola de Sagres remotamente, via ssh.
+- Explicar como usar Python no Escola de Sagres, com acesso remoto, via navegador, a *notebooks* marimo.
+
+
+# O supercomputador Escola de Sagres
+
+O supercomputador Escola de Sagres é um computador de alto desempenho situado no Instituto Politécnico, no *campus* regional da UERJ em Nova Friburgo, conectado
+a redes internacionais de pesquisa.
+
+O supercomputador Escola de Sagres possui
+
+- Pico de performance teórica (Rpeak) de 4,6 trilhões de operações de ponto flutuante por segundo (TFLOPS);
+- Computação paralela (IA) de 72 trilhões de operações de ponto flutuante por segundo (TFLOPS);
+- 128 núcleos;
+- 256 threads;
+- 2560 núcleos CUDA;
+- 1024 GB de RAM;
+- 1440 GB de SSD SATA;
+- 3840 GB de SSD NVMe; e
+- 112 TB de HDD.
+
+Além do nó de *login*, o sistema consiste de 
+
+- Dois nós CPU (`bartolomeu-dias` e `vasco-da-gama`); e
+- Um nó GPU (`pedro-alvares-cabral`) com duas GPU NVIDIA A2 16GB GDDR6 PCIe.
+
+Todos os nós rodam o sistema operacional Rocky Linux^[Rocky Linux: <https://rockylinux.org>.].
+
+Para o gerenciamento de *jobs*, é usado o Slurm^[Slurm: <https://slurm.schedmd.com/overview.html>.].
+
+Mais informações sobre o Escola de Sagres, em português, estão nos *links* abaixo:
+
+- [Ficha técnica](https://docs.google.com/document/d/1zd4JEPxoMiMSn1drD0dTPm5LX0HT8dhjUOIfu3_b5-s);
+- [Tutoriais e exemplos](https://drive.google.com/drive/folders/1S4_EyoJ1SZ_OLKs1hDHHL_Sbv3MpMdGE).
+
+::: {.callout-note title="Como ter acesso ao Escola de Sagres"}
+
+Preencha o formulário de solicitação de uso em <http://www.bit.ly/sagresHPC>.
+
+:::
+
+
+# Acesso remoto via ssh
+
+É possível acessar o Escola de Sagres via terminal, usando *Secure Shell Protocol* [@barrett05:_ssh]. Nesta seção, explicaremos como fazer isto.
+
+1. É preciso ter um cliente SSH instalado no seu computador. Em ambientes Linux, basta usar no *shell* o comando `ssh`^[SSH *man*: <https://www.man7.org/linux/man-pages/man1/ssh.1.html>.], que já vem instalado. No Windows, você pode instalar um dos seguintes programas (ou outro semelhante):
+
+   - PuTTY^[PuTTY: <https://www.ssh.com/academy/ssh/putty/download>.].
+   - MobaXterm^[MobaXterm: <https://mobaxterm.mobatek.net/download.html>.].
+   
+1. [Se você estiver no Linux]{.hl}, execute o comando
+
+   ```{bash}
+   ssh -i /caminho/para/chave/privada -p 5522 nome.usuario@179.106.49.41
+   ```
+   
+   substituindo `/caminho/para/chave/privada` pelo caminho para o arquivo de chave privada que você recebeu quando abriu a sua conta no Escola de Sagres e substituindo `nome.usuario` pelo seu nome de usuário.
+   
+1. [Se você estiver no Windows]{.hl}, configure o seu cliente SSH do seguinte modo:
+
+   - Endereço do *host*: 179.106.49.41;
+   - Porta: 5522;
+   - No campo adequado, entre seu nome de usuário;
+   - No campo adequado, escolha usar chave privada;
+   - No campo adequado, entre o caminho do arquivo de chave privada que você recebeu quando abriu a sua conta no Escola de Sagres.
+
+Se tudo der certo, você estará no *prompt* de um *shell* no nó de *login*. Se necessário, entre a senha que você recebeu quando abriu a sua conta no Escola de Sagres.
+
+
+## Configuração permanente no Linux
+
+No Linux, é possível salvar as configurações do `ssh` no arquivo `~/.ssh/config` de maneira a simplificar o comando de acesso.
+
+Adicione ao arquivo `~/.ssh/config` as seguintes linhas (substituindo `/caminho/para/chave/privada` pelo caminho para o arquivo de chave privada que você recebeu quando abriu a sua conta no Escola de Sagres e substituindo `nome.usuario` pelo seu nome de usuário):
+
+```{bash}
+Host sagres
+    HostName 179.106.49.41
+    User nome.usuario
+    Port 5522
+    IdentityFile /caminho/para/chave/privada
+    IdentitiesOnly yes
+```
+
+Depois de salvar o arquivo, você pode se conectar ao Escola de Sagres digitando 
+
+```{bash}
+ssh sagres
+```
+
+no seu *shell*.
+
+
+# *Notebooks* marimo
+
+???
+
+
+# Acesso remoto a marimo via navegador
+
+???
+
+
+# Referências {.unnumbered}
+
+::: {#refs}
+:::
+
