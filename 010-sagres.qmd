@@ -57,7 +57,7 @@ use_virtualenv('../.venv')
 
 # Sobre este documento
 
-Este documento foi gerado usando Quarto^[Quarto: <https://quarto.org/>.], a partir do arquivo fonte <https://github.com/fnaufel/???> (salvo em um repositório privado no Github; entre em contato caso deseje ter acesso).
+Este documento foi gerado usando Quarto^[Quarto: <https://quarto.org/>.], a partir do arquivo fonte <https://github.com/fnaufel/sagres-marimo/blob/master/010-sagres.qmd> (salvo em um repositório privado no Github; entre em contato caso deseje ter acesso).
 
 A maneira mais fácil de ver o fonte que gerou este documento é clicando no *link* `</> Código`, no alto desta página, à direita.
 
@@ -109,37 +109,23 @@ Preencha o formulário de solicitação de uso em <http://www.bit.ly/sagresHPC>.
 :::
 
 
-# Acesso remoto via ssh
+# Acesso remoto via ssh {#sec-ssh}
 
 É possível acessar o Escola de Sagres via terminal, usando *Secure Shell Protocol* [@barrett05:_ssh]. Nesta seção, explicaremos como fazer isto.
 
-1. É preciso ter um cliente SSH instalado no seu computador. Em ambientes Linux, basta usar no *shell* o comando `ssh`^[SSH *man*: <https://www.man7.org/linux/man-pages/man1/ssh.1.html>.], que já vem instalado. No Windows, você pode instalar um dos seguintes programas (ou outro semelhante):
+## Linux {#sec-ssh-linux}
 
-   - PuTTY^[PuTTY: <https://www.ssh.com/academy/ssh/putty/download>.].
-   - MobaXterm^[MobaXterm: <https://mobaxterm.mobatek.net/download.html>.].
-   
-1. [Se você estiver no Linux]{.hl}, execute o comando
+Execute o comando
 
-   ```{bash}
-   ssh -i /caminho/para/chave/privada -p 5522 nome.usuario@179.106.49.41
-   ```
+```{bash}
+ssh -i /caminho/para/chave/privada -p 5522 nome.usuario@179.106.49.41
+```
    
-   substituindo `/caminho/para/chave/privada` pelo caminho para o arquivo de chave privada que você recebeu quando abriu a sua conta no Escola de Sagres e substituindo `nome.usuario` pelo seu nome de usuário.
-   
-1. [Se você estiver no Windows]{.hl}, configure o seu cliente SSH do seguinte modo:
-
-   - Endereço do *host*: 179.106.49.41;
-   - Porta: 5522;
-   - No campo adequado, entre seu nome de usuário;
-   - No campo adequado, escolha usar chave privada;
-   - No campo adequado, entre o caminho do arquivo de chave privada que você recebeu quando abriu a sua conta no Escola de Sagres.
+substituindo `/caminho/para/chave/privada` pelo caminho para o arquivo de chave privada que você recebeu quando abriu a sua conta no Escola de Sagres e substituindo `nome.usuario` pelo seu nome de usuário.
 
 Se tudo der certo, você estará no *prompt* de um *shell* no nó de *login*. Se necessário, entre a senha que você recebeu quando abriu a sua conta no Escola de Sagres.
 
-
-## Configuração permanente no Linux
-
-No Linux, é possível salvar as configurações do `ssh` no arquivo `~/.ssh/config` de maneira a simplificar o comando de acesso.
+É possível salvar as configurações do `ssh` no arquivo `~/.ssh/config` de maneira a simplificar o comando de acesso.
 
 Adicione ao arquivo `~/.ssh/config` as seguintes linhas (substituindo `/caminho/para/chave/privada` pelo caminho para o arquivo de chave privada que você recebeu quando abriu a sua conta no Escola de Sagres e substituindo `nome.usuario` pelo seu nome de usuário):
 
@@ -150,15 +136,39 @@ Host sagres
     Port 5522
     IdentityFile /caminho/para/chave/privada
     IdentitiesOnly yes
+    
+Host bartolomeu-dias vasco-da-gama pedro-alvares-cabral
+    User nome.usuario
+    IdentityFile /caminho/para/chave/privada
+    IdentitiesOnly yes
+    ProxyJump sagres
 ```
 
-Depois de salvar o arquivo, você pode se conectar ao Escola de Sagres digitando 
+Depois de salvar o arquivo, você pode se conectar ao Escola de Sagres digitando apenas
 
 ```{bash}
 ssh sagres
 ```
 
-no seu *shell*.
+no seu *shell*. Além disso, você pode se conectar via SSH com os outros três nós do Escola de Sagres, usando o nome do nó desejado.
+
+
+## Windows
+
+É preciso ter um cliente SSH instalado no seu computador. No Windows, você pode instalar um dos seguintes programas (ou outro semelhante):
+
+- PuTTY^[PuTTY: <https://www.ssh.com/academy/ssh/putty/download>.].
+- MobaXterm^[MobaXterm: <https://mobaxterm.mobatek.net/download.html>.].
+   
+Configure o seu cliente SSH do seguinte modo:
+
+   - Endereço do *host*: 179.106.49.41;
+   - Porta: 5522;
+   - No campo adequado, entre seu nome de usuário;
+   - No campo adequado, escolha usar chave privada;
+   - No campo adequado, entre o caminho do arquivo de chave privada que você recebeu quando abriu a sua conta no Escola de Sagres.
+
+Se tudo der certo, você estará no *prompt* de um *shell* no nó de *login*. Se necessário, entre a senha que você recebeu quando abriu a sua conta no Escola de Sagres.
 
 
 # *Notebooks* marimo
@@ -168,7 +178,319 @@ no seu *shell*.
 
 # Acesso remoto a marimo via navegador
 
-???
+## Linux
+
+Nesta seção, vamos fazer o seguinte:
+
+- Conectar ao nó de *login*;
+- Verificar/escolher uma versão de Python;
+- Instalar o gerenciador de pacotes e projetos `uv`^[uv: <https://docs.astral.sh/uv/>] para Python;
+- Criar um projeto Python usando `uv`, com um ambiente virtual;
+- Instalar o marimo no ambiente do projeto.
+- Executar marimo sem o navegador.
+- Acessar o marimo no seu computador local.
+
+
+### Conectar ao nó de *login*
+
+Conecte ao Escola de Sagres usando um dos métodos descritos na @sec-ssh.
+
+
+### Escolher a versão de Python
+
+Para verificar se Python 3 está disponível, entre no terminal do Escola de Sagres:
+
+```{bash}
+which python3
+```
+
+Se a resposta for vazia, Python 3 não está disponível no seu *path*. Busque ajuda.
+
+Para verificar a versão de Python 3 disponível, entre no terminal do Escola de Sagres:
+
+```{bash}
+python3 --version
+```
+
+O resultado é algo como
+
+```
+Python 3.8.17
+```
+
+Mas [não vamos usar esta versão de Python]{.hl}, pois provavelmente não é a mesma versão que está instalada nos nós de *compute* (lembre-se de que você está conectado ao nó de *login*).
+
+Em vez disto, vamos usar o sistema de módulos.
+
+Para ver qual módulo de Python existe, entre no terminal do Escola de Sagres:
+
+```{bash}
+module spider python
+```
+
+O retorno será algo como
+
+```
+------------------------------------------
+  python: python/3.12.1-gcc-8.5.0-hpdejov
+------------------------------------------
+
+    This module can be loaded directly: module load python/3.12.1-gcc-8.5.0-hpdejov
+
+    Help:
+      Name   : python
+      Version: 3.12.1
+      Target : zen
+      
+      The Python programming language.
+```
+
+(Se a resposta disser que não existe módulo `python`, busque ajuda.)
+
+Perceba que esta versão de Python é diferente da que obtivemos com `python3 --version`.
+
+Para usarmos esta versão, basta entrar no terminal do Escola de Sagres:
+
+```{bash}
+module load python
+```
+
+Para verificar quais módulos estão carregados no momento, entre no terminal do Escola de Sagres:
+
+```{bash}
+module list
+```
+
+A resposta será algo como
+
+```
+Currently Loaded Modules:
+  1) glibc/2.28-gcc-8.5.0-3kybixu         13) libxml2/2.13.4-gcc-8.5.0-53aexux
+  2) gcc-runtime/8.5.0-gcc-8.5.0-u6ywdr3  14) pigz/2.8-gcc-8.5.0-a3fzchp
+  3) bzip2/1.0.8-gcc-8.5.0-scsing2        15) zstd/1.5.6-gcc-8.5.0-ylwnc6f
+  4) libmd/1.0.4-gcc-8.5.0-mbjmqa2        16) tar/1.34-gcc-8.5.0-pbjuzbl
+  5) libbsd/0.12.2-gcc-8.5.0-4rawvvs      17) gettext/0.22.5-gcc-8.5.0-by6lzz5
+  6) expat/2.6.4-gcc-8.5.0-e2bqgj2        18) libffi/3.4.6-gcc-8.5.0-zmbj6fg
+  7) ncurses/6.5-gcc-8.5.0-iuumtdh        19) libxcrypt/4.4.35-gcc-8.5.0-v22hqf6
+  8) readline/8.2-gcc-8.5.0-drw3mna       20) openssl/3.4.0-gcc-8.5.0-qudabsy
+  9) gdbm/1.23-gcc-8.5.0-34yh2wr          21) sqlite/3.46.0-gcc-8.5.0-4t3pqq7
+ 10) libiconv/1.17-gcc-8.5.0-xyzcimc      22) util-linux-uuid/2.40.2-gcc-8.5.0-ayorkts
+ 11) xz/5.4.6-gcc-8.5.0-jzfknv7           23) python/3.12.1-gcc-8.5.0-hpdejov
+ 12) zlib-ng/2.2.1-gcc-8.5.0-5btjbct
+```
+
+## Instalar `uv`
+
+Entre no terminal do Escola de Sagres:
+
+```{bash}
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+Este comando instalará `uv` em `~/.local/bin`. Verifique com
+
+```{bash}
+which uv && uv --version
+```
+
+A resposta deve ser algo como
+
+```
+~/.local/bin/uv
+uv 0.10.8
+```
+
+
+## Criar um projeto Python
+
+Para criar um projeto no diretório `exemplo`, entre
+
+```{bash}
+uv init exemplo
+```
+
+Vá para o diretório:
+
+```{bash}
+cd exemplo
+```
+
+Digite `ls -a` para ver os arquivos criados:
+
+```
+.  ..  .git  .gitignore  .python-version  README.md  main.py  pyproject.toml
+```
+
+O arquivo `pyproject.toml` é o mais importante. Nele, ficam armazenadas as informações sobre o projeto. Seu conteúdo inicial é algo como
+
+```
+[project]
+name = "exemplo"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = []
+```
+
+Você pode --- e deve --- editar o arquivo para preencher a descrição do projeto.
+
+Perceba que também foi criado um repositório do git.
+
+Para mais detalhes sobre a criação de projetos com `uv`, veja a [documentação](https://docs.astral.sh/uv/guides/projects/).
+
+
+## Instalar marimo no ambiente do projeto
+
+Digite
+
+```{bash}
+uv add marimo
+```
+
+O início da saída é algo como
+
+```
+Using CPython 3.12.1 interpreter at: /opt/software/spack/opt/spack/linux-rocky8-zen/gcc-8.5.0/python-3.12.1-hpdejovpk4m4whx64iaa2zvawfamn4jg/bin/python3.12
+Creating virtual environment at: .venv
+```
+
+Perceba que um ambiente virtual foi criado.
+
+Se você verificar o conteúdo de `pyproject.toml`, verá que foi adicionada a informação
+
+```
+dependencies = [
+    "marimo>=0.20.4",
+]
+```
+
+Agora falta apenas ativar o ambiente virtual:
+
+```{bash}
+source .venv/bin/activate
+```
+
+O *prompt* deve mudar, com o nome do ambiente virtual `(exemplo)` no início da linha.
+
+
+## Executar marimo sem o navegador
+
+Você ainda está no nó de *login*. O ideal é rodar o marimo em um nó de *compute*, principalmente se você quiser usar mais recursos.
+
+O primeiro passo é usar o Slurm para rodar um *shell* em outro nó (aqui, o Bartolomeu Dias):
+
+```{bash}
+srun --partition=cpu --nodelist=bartolomeu-dias --pty bash
+```
+
+O novo *prompt* mostra que você está em outro nó (mas ainda no mesmo diretório e no mesmo ambiente virtual).
+
+Agora você pode rodar o marimo:
+
+```{bash}
+marimo edit --host 127.0.0.1 --port 8888
+```
+
+O resultado será algo como
+
+```
+Create or edit notebooks in your browser 📝
+
+➜  URL: http://localhost:8888?access_token=hK7h4aZkRqJvuVwKFXY9QQ
+```
+
+O terminal ficará bloqueado enquanto o marimo estiver executando.
+
+
+## Acessar o marimo no seu computador local
+
+Agora passe para um *shell* no seu computador local.
+
+Vamos supor que seu arquivo `~/.ssh/config` tem o conteúdo descrito no final da @sec-ssh-linux.
+
+O seguinte comando cria a conexão desejada, mapeando a porta remota onde está o marimo (no nó `bartolomeu-dias`) para a porta local do seu computador:
+
+```{bash}
+ssh -N -L 8888:localhost:8888 bartolomeu-dias
+```
+
+O *shell* ficará bloqueado.
+
+Agora, basta acessar, no seu navegador, o URL especificado na mensagem que o marimo emitiu quando foi iniciado (neste exemplo, `http://localhost:8888?access_token=hK7h4aZkRqJvuVwKFXY9QQ`).
+
+Você deve ver a tela inicial do marimo:
+
+![](images/tela-inicial-marimo.png)
+
+
+## Recapitulação dos passos
+
+- No seu computador:
+
+  ```{bash}
+  ssh sagres
+  ```
+
+- No nó de *login*:
+
+  - Carregar o Python:
+
+    ```{bash}
+    module load python
+    ```
+
+  - Se quiser criar um novo projeto:
+
+    ```{bash}
+    uv init exemplo
+    cd exemplo
+    uv add marimo
+    source .venv/bin/activate
+    ```
+
+  - Se quiser trabalhar em um projeto já existente:
+
+    ```{bash}
+    cd exemplo
+    source .venv/bin/activate
+    ```
+
+  - Para ir para um *shell* em um nó de *compute* (e.g., `bartolomeu-dias`):
+
+    ```{bash}
+    srun --partition=cpu --nodelist=bartolomeu-dias --pty bash
+    ```
+
+- No nó de compute:
+
+  - Rodar marimo:
+  
+    ```{bash}
+    marimo edit --host 127.0.0.1 --port 8888
+    ```
+  
+- No seu computador:
+
+  - Criar conexão SSH, mapeando as portas:
+  
+    ```{bash}
+    ssh -N -L 8888:localhost:8888 bartolomeu-dias
+    ```
+    
+  - Acessar, no seu navegador, o URL especificado pelo marimo.
+
+::: {.callout-note title="Atenção"}
+
+Se a conexão entre seu computador e o marimo ficar ociosa muito tempo, ela pode ser desfeita. Neste caso, aparecerá uma mensagem de erro no seu navegador. Para restabelecer a conexão, basta entrar novamente, no seu *shell*, o comando `ssh` que mapeia as portas
+
+```{bash}
+ssh -N -L 8888:localhost:8888 bartolomeu-dias
+```
+
+e recarregar a página no navegador.
+
+:::
 
 
 # Referências {.unnumbered}
