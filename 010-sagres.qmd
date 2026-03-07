@@ -57,7 +57,7 @@ use_virtualenv('../.venv')
 
 # Sobre este documento
 
-Este documento foi gerado usando Quarto^[Quarto: <https://quarto.org/>.], a partir do arquivo fonte <https://github.com/fnaufel/sagres-marimo/blob/master/010-sagres.qmd> (salvo em um repositório privado no Github; entre em contato caso deseje ter acesso).
+Este documento foi gerado usando Quarto^[Quarto: <https://quarto.org/>.], a partir do arquivo fonte <https://github.com/fnaufel/sagres-marimo/blob/master/010-sagres.qmd> (salvo em um repositório público no Github).
 
 A maneira mais fácil de ver o fonte que gerou este documento é clicando no *link* `</> Código`, no alto desta página, à direita.
 
@@ -66,9 +66,9 @@ Caso você tenha perguntas, correções ou sugestões sobre o conteúdo deste do
 
 # Objetivos
 
-- Apresentar o supercomputador Escola de Sagres.
-- Explicar como usar o Escola de Sagres remotamente, via ssh.
-- Explicar como usar Python no Escola de Sagres, com acesso remoto, via navegador, a *notebooks* marimo.
+- [Apresentar o supercomputador Escola de Sagres]{.hl}.
+- Explicar como [usar o Escola de Sagres remotamente, via SSH]{.hl}.
+- Explicar como [usar Python no Escola de Sagres]{.hl}, com [acesso remoto a *notebooks* marimo]{.hl} (via navegador).
 
 
 # O supercomputador Escola de Sagres
@@ -115,7 +115,7 @@ Preencha o formulário de solicitação de uso em <http://www.bit.ly/sagresHPC>.
 
 ## Linux {#sec-ssh-linux}
 
-Execute o comando
+O comando `ssh`^[`ssh` *man page*: <https://www.man7.org/linux/man-pages/man1/ssh.1.html>.] já vem instalado no Linux. Execute, no *shell*,
 
 ```{bash}
 ssh -i /caminho/para/chave/privada -p 5522 nome.usuario@179.106.49.41
@@ -153,7 +153,7 @@ ssh sagres
 no seu *shell*. Além disso, você pode se conectar via SSH com os outros três nós do Escola de Sagres, usando o nome do nó desejado.
 
 
-## Windows
+## Windows {#sec-ssh-win}
 
 É preciso ter um cliente SSH instalado no seu computador. No Windows, você pode instalar um dos seguintes programas (ou outro semelhante):
 
@@ -173,30 +173,62 @@ Se tudo der certo, você estará no *prompt* de um *shell* no nó de *login*. Se
 
 # *Notebooks* marimo
 
-???
+Marimo^[marimo: <https://docs.marimo.io>] é um *notebook* para Python, semelhante a (mas mais avançado que) Jupyter.
+
+Marimo oferece os seguintes recursos:
+
+- Tudo necessário, em um só lugar: substitui `jupyter`, `streamlit`, `jupytext`, `ipywidgets`, `papermill` e outras ferramentas do ecossistema;
+
+- Reatividade de verdade: ao executar uma célula, o marimo [atualiza automaticamente todas as células dependentes](https://docs.marimo.io/guides/reactivity/) ou [as sinaliza como desatualizadas](https://docs.marimo.io/#expensive-notebooks), conforme o caso. Isto evita o **problema do estado oculto**, comum em *notebooks* jupyter quando as células são executadas fora de ordem;
+
+- Interatividade nativa: conecta [sliders, tabelas, gráficos e outros componentes](https://docs.marimo.io/guides/interactivity/) diretamente ao Python — sem precisar escrever *callbacks*;
+
+- Amigabilidade ao Git: *notebooks* são salvos como arquivos `.py`, facilitando versionamento, revisão e colaboração;
+
+- Acesso a e visualização de dados: permite consultar *dataframes*, bancos de dados, data *warehouses* e *lakehouses* [com SQL](https://docs.marimo.io/guides/working_with_data/sql/), além de [filtrar e pesquisar *dataframes*](https://docs.marimo.io/guides/working_with_data/dataframes/) com praticidade;
+
+- Integração de IA ao fluxo de trabalho: [permite gerar células com IA](https://docs.marimo.io/guides/generate_with_ai/), com foco em tarefas de análise e manipulação de dados;
+
+- Reprodutibilidade por padrão: [sem estado oculto](https://docs.marimo.io/guides/reactivity/), com execução determinística e [gerenciamento de pacotes embutido](https://docs.marimo.io/guides/editor_features/package_management/);
+
+- Executabilidade como *script*: permite rodar o *notebook* [como um *script* Python](https://docs.marimo.io/guides/scripts/), inclusive com parâmetros passados por linha de comando;
+
+- Facilidade de compartilhamento: permite publicação do *notebook* como [aplicativo *web* interativo](https://docs.marimo.io/guides/apps/) ou como [*slides*](https://docs.marimo.io/guides/apps/#slides-layout), e até [como aplicativo executável no navegador via WASM](https://docs.marimo.io/guides/wasm/);
+
+- Reutilização de código: [permite importar funções e classes](https://docs.marimo.io/guides/reusing_functions/) de um *notebook* para outro sem atrito;
+
+- Testabilidade: permite aplicar [`pytest` aos *notebooks*](https://docs.marimo.io/guides/testing/) e incorporar testes ao fluxo de desenvolvimento;
+
+- Uso em editores modernos: suporta [GitHub Copilot](https://docs.marimo.io/guides/editor_features/ai_completion/#github-copilot), [assistentes de IA](https://docs.marimo.io/guides/editor_features/ai_completion/), [atalhos do vim](https://docs.marimo.io/guides/editor_features/overview/#vim-keybindings), exploradores de variáveis e [outros recursos](https://docs.marimo.io/guides/editor_features/);
+
+- Uso em outros IDEs: pode ser usado no [VS Code ou Cursor](https://marketplace.visualstudio.com/items?itemName=marimo-team.vscode-marimo), ou no neovim, Zed, [ou qualquer outro editor de texto](https://docs.marimo.io/guides/editor_features/watching/).
+
+Para aprender mais sobre o marimo, visite
+
+- O [*site*](https://docs.marimo.io);
+- Esta [*playlist* no YouTube](https://www.youtube.com/watch?v=3N6lInzq5MI&list=PLNJXGo8e1XT9jP7gPbRdm1XwloZVFvLEq);
+- A [galeria de exemplos de *notebooks*](https://marimo.io/gallery).
 
 
 # Acesso remoto a marimo via navegador
 
-## Linux
-
 Nesta seção, vamos fazer o seguinte:
 
-- Conectar ao nó de *login*;
-- Verificar/escolher uma versão de Python;
-- Instalar o gerenciador de pacotes e projetos `uv`^[uv: <https://docs.astral.sh/uv/>] para Python;
-- Criar um projeto Python usando `uv`, com um ambiente virtual;
-- Instalar o marimo no ambiente do projeto.
-- Executar marimo sem o navegador.
-- Acessar o marimo no seu computador local.
+1. Conectar ao nó de *login*;
+1. Verificar/escolher uma versão de Python;
+1. Instalar o gerenciador de pacotes e projetos `uv`^[uv: <https://docs.astral.sh/uv/>] para Python;
+1. Criar um projeto Python usando `uv`, com um ambiente virtual;
+1. Instalar o marimo no ambiente do projeto.
+1. Executar marimo sem o navegador.
+1. Acessar o marimo no seu computador local.
 
 
-### Conectar ao nó de *login*
+## Conectar ao nó de *login*
 
 Conecte ao Escola de Sagres usando um dos métodos descritos na @sec-ssh.
 
 
-### Escolher a versão de Python
+## Escolher a versão de Python
 
 Para verificar se Python 3 está disponível, entre no terminal do Escola de Sagres:
 
@@ -218,7 +250,7 @@ O resultado é algo como
 Python 3.8.17
 ```
 
-Mas [não vamos usar esta versão de Python]{.hl}, pois provavelmente não é a mesma versão que está instalada nos nós de *compute* (lembre-se de que você está conectado ao nó de *login*).
+Mas não vamos usar esta versão de Python, pois provavelmente não é a mesma versão que está instalada nos nós de *compute* (lembre-se de que você está conectado ao nó de *login*).
 
 Em vez disto, vamos usar o sistema de módulos.
 
@@ -300,10 +332,16 @@ A resposta deve ser algo como
 uv 0.10.8
 ```
 
+::: {.callout-note title="Atenção"}
+
+Você só precisa instalar o `uv` no seu diretório HOME uma vez.
+
+:::
+
 
 ## Criar um projeto Python
 
-Para criar um projeto no diretório `exemplo`, entre
+Para criar um projeto em um novo diretório chamado `exemplo`, entre
 
 ```{bash}
 uv init exemplo
@@ -365,6 +403,18 @@ dependencies = [
 ]
 ```
 
+::: {.callout-note title="Por que várias instalações do marimo?"}
+
+Como estamos usando um ambiente virtual exclusivo do projeto, precisamos instalar o marimo em cada novo projeto. 
+
+Isto não usa tanta memória assim, e o `uv` tem um *cache* de pacotes instalados, o que faz com que instalações subsequentes sejam rápidas.
+
+Isto também permite que projetos diferentes usem versões diferentes do marimo, evitando problemas de desatualização.
+
+Caso deseje instalar o marimo uma única vez, de maneira que esteja disponível para todos os projetos, veja a [documentação do uv sobre *tools*](https://docs.astral.sh/uv/concepts/tools/), [mas isto não é recomendável]{.hl}.
+
+:::
+
 Agora falta apenas ativar o ambiente virtual:
 
 ```{bash}
@@ -386,7 +436,7 @@ srun --partition=cpu --nodelist=bartolomeu-dias --pty bash
 
 O novo *prompt* mostra que você está em outro nó (mas ainda no mesmo diretório e no mesmo ambiente virtual).
 
-Agora você pode rodar o marimo:
+Agora você pode rodar o marimo. Aqui, usamos a porta 8888. Se esta porta estiver ocupada, escolha outra:
 
 ```{bash}
 marimo edit --host 127.0.0.1 --port 8888
@@ -405,6 +455,8 @@ O terminal ficará bloqueado enquanto o marimo estiver executando.
 
 ## Acessar o marimo no seu computador local
 
+### Linux
+
 Agora passe para um *shell* no seu computador local.
 
 Vamos supor que seu arquivo `~/.ssh/config` tem o conteúdo descrito no final da @sec-ssh-linux.
@@ -417,6 +469,14 @@ ssh -N -L 8888:localhost:8888 bartolomeu-dias
 
 O *shell* ficará bloqueado.
 
+
+### Windows {#sec-tunneling-win}
+
+???
+
+
+### Navegador
+
 Agora, basta acessar, no seu navegador, o URL especificado na mensagem que o marimo emitiu quando foi iniciado (neste exemplo, `http://localhost:8888?access_token=hK7h4aZkRqJvuVwKFXY9QQ`).
 
 Você deve ver a tela inicial do marimo:
@@ -428,9 +488,13 @@ Você deve ver a tela inicial do marimo:
 
 - No seu computador:
 
-  ```{bash}
-  ssh sagres
-  ```
+  - Se estiver no Linux:
+
+    ```{bash}
+    ssh sagres
+    ```
+  
+  - Se estiver no Windows, seguir as instruções na @sec-ssh-win.
 
 - No nó de *login*:
 
@@ -464,7 +528,7 @@ Você deve ver a tela inicial do marimo:
 
 - No nó de compute:
 
-  - Rodar marimo:
+  - Rodar marimo na porta 8888:
   
     ```{bash}
     marimo edit --host 127.0.0.1 --port 8888
@@ -472,23 +536,24 @@ Você deve ver a tela inicial do marimo:
   
 - No seu computador:
 
-  - Criar conexão SSH, mapeando as portas:
+  - Se estiver no Linux:
+
+    Criar conexão SSH, mapeando as portas:
   
     ```{bash}
     ssh -N -L 8888:localhost:8888 bartolomeu-dias
     ```
     
+  - Se estiver no Windows, seguir as instruções na @sec-tunneling-win.
+  
   - Acessar, no seu navegador, o URL especificado pelo marimo.
 
 ::: {.callout-note title="Atenção"}
 
-Se a conexão entre seu computador e o marimo ficar ociosa muito tempo, ela pode ser desfeita. Neste caso, aparecerá uma mensagem de erro no seu navegador. Para restabelecer a conexão, basta entrar novamente, no seu *shell*, o comando `ssh` que mapeia as portas
+Se a conexão entre seu computador e o marimo ficar ociosa muito tempo, ela pode ser desfeita. Neste caso, aparecerá uma mensagem de erro no seu navegador. Para restabelecer a conexão, basta 
 
-```{bash}
-ssh -N -L 8888:localhost:8888 bartolomeu-dias
-```
-
-e recarregar a página no navegador.
+- Executar novamente, no seu computador local, o comando para conectar via SSH, mapeando as portas; e
+- Recarregar a página no navegador.
 
 :::
 
