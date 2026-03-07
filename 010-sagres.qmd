@@ -1,5 +1,5 @@
 ---
-title: "Uso remoto do supercomputador Escola de Sagres no projeto BioSensIA"
+title: "Uso remoto de *notebooks* marimo no supercomputador Escola de Sagres"
 author: 
   name: "Fernando Náufel"
   email: fnaufel@gmail.com
