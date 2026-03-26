@@ -50,8 +50,8 @@ format:
 
 ```{r setup, include=FALSE}
 source('_setup.R')
-library(reticulate)
-use_virtualenv('../.venv')
+#library(reticulate)
+#use_virtualenv('../.venv')
 ```
 
 
